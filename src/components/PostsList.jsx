@@ -1,28 +1,23 @@
 import React, { useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { savedPosts,  postedStatus, postedError } from '../features/postsSlice'
-import { fetchPosts } from '../features/postsSlice'
 
+import { useGetPostsQuery } from '../features/postsSlice';
 import PostData from './PostData'
 function PostsList() {
-    const posts= useSelector(savedPosts)
-    const dispatch=useDispatch();
-    const postStatus=useSelector(postedStatus)
-    const postError=useSelector(postedError)
-    useEffect(()=>{
-      if(postStatus==="idle" && posts.length===0){
-        
-        console.log(posts.length)
-        dispatch(fetchPosts())
-      }
-      
-    },[postStatus,posts.length,dispatch])
+  console.log(useGetPostsQuery)
+  const {
+    data: posts,
+    isLoading,
+    isSuccess,
+    isError,
+    error
+  } = useGetPostsQuery();
+  
     let postDisplay;
     
-    if(postStatus==='loading'){
+    if(isLoading){
       postDisplay=<p>Loading...</p>
     }
-   else if(postStatus=='success'){
+   else if(isSuccess){
       
       const sortedPosts= posts.slice().sort((a,b)=> b.date.localeCompare(a.date))
   ;
@@ -31,8 +26,8 @@ function PostsList() {
         return <PostData key={post.id} post={post}></PostData>
       })
     }
-    else if(postStatus==='error'){
-      postDisplay= <p>{postError}</p>
+    else if(isError){
+      postDisplay= <p>{error}</p>
     }
   return (
     <section className='mt-1 justify-center items-center flex flex-col w-screen '>

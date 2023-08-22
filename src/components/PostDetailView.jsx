@@ -1,18 +1,23 @@
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+
 import {  useParams } from 'react-router-dom';
-import { deletePost, postDetails } from '../features/postsSlice';
+import { useGetPostsQuery } from '../features/postsSlice';
 import Author from './Author';
 import TimePosted from './timePosted';
 import Reactions from './Reactions';
 import { Button } from '@chakra-ui/react';
 import { Link, useNavigate } from 'react-router-dom';
 function PostDetailView() {
-   const dispatch =useDispatch()
-   const navigate=useNavigate();
+
    const {postId}=useParams()
    console.log(postId)
-    const post=useSelector((state)=> postDetails(state,Number(postId)));
+   const {post,isLoading} = useGetPostsQuery('getPosts',{
+    selectFromResult: ({data, isLoading})=>({
+        post: data.entities[postId],
+        isLoading
+    })
+   })
+   // const post=useSelector((state)=> postDetails(state,Number(postId)));
     if(!post){
         return <p>Post Not Found</p>
     }

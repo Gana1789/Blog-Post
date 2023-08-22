@@ -1,15 +1,17 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
-import { selectAllUsers } from '../features/usersSlice';
+
 
 function Author({userId}) {
-    const usersList=useSelector(selectAllUsers);
-    const authorData=usersList.filter(user=>{
-        return user.id==userId;
-    })
+  const {user, isLoading, isSuccess}=useGetUsersQuery("getUsers",{
+    selectFromResult: (data,isLoading)=>{
+      data.filter(user=>{ return user.id===userId}),
+      isLoading
+    }
+  })
+   
  
   return (
-   <span className='font-bold text-slate-700 dark: bg-slate-50'>by {authorData.length>0 ? authorData[0].name : "Unknown Author"}</span>
+   <span className='font-bold text-slate-700 dark: bg-slate-50'>by {user.length>0 ? user[0].name : "Unknown Author"}</span>
   )
 }
 

@@ -9,12 +9,13 @@ import {
     Select
   } from '@chakra-ui/react'
 
-// import { selectAllUsers } from '../features/usersSlice'
+
 import UsersList from './UsersList'
-import { useSelector, useDispatch } from 'react-redux'
-import { addPost } from '../features/postsSlice'
+
+import {  useAddNewPostMutation } from '../features/postsSlice'
 import {useNavigate} from 'react-router-dom'
 function AddPost() {
+  const [addNewPost, {isLoading}]= useAddNewPostMutation()
   const navigate=useNavigate();
     const [title,setTitle]=useState('')
     const [content,setContent]=useState('')
@@ -25,27 +26,24 @@ function AddPost() {
     const onTitleChange= (e)=> setTitle(e.target.value)
     const onContentChange=(e)=> setContent(e.target.value)
     const onAuthorChange=(e)=> setUserId(e.target.value)
-    const dispatch =useDispatch()
-    const [addStatus,setAddStatus]=useState("idle")
-    const savePost=()=>{
-        if(title && content && addStatus==="idle"){
+   
+    const savePost= async()=>{
+        if(title && content && !isLoading){
            try{
-
-             dispatch(addPost({title,body:content,userId})).unwrap()
+            await addNewPost({title,body:content,userId}).unwrap();
+            // dispatch(addPost({title,body:content,userId})).unwrap()
              setContent('')
              setTitle('')
              setUserId('')
              authorSelection.current.selectedIndex=0
              navigate('/')
-             setAddStatus("fullfilled")
+            
            }
            catch(er){
             setIsError(true)
             console.error("failed to save")
            }
-           finally{
-            setAddStatus("idle")
-           }
+           
         }
         
         else{

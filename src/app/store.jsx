@@ -1,21 +1,15 @@
 import { configureStore } from "@reduxjs/toolkit";
-import postsReducer from "../features/postsSlice"
-import usersReducer from "../features/usersSlice"
+
+import { blogSlice } from "../api/blogSlice";
 export const store =configureStore({
     reducer:{
-       posts:postsReducer,
-       users: usersReducer,
+       [blogSlice.reducerPath]: blogSlice.reducer,
+      
     },
-    // middleware: (getDefaultMiddleware) =>
-    // getDefaultMiddleware({
-    //   serializableCheck: {
-    //     // Ignore these action types
-    //     ignoredActions: ['fetchPosts'],
-    //     // Ignore these field paths in all actions
-    //     ignoredActionPaths: ['meta.arg', 'payload.headers','payload.config','payload.request'],
-    //     // Ignore these paths in the state
-    //     ignoredPaths: ['payload.config'],
-    //   },
-    // })
+    middleware: getDefaultMiddleware=>
+        getDefaultMiddleware().concat(blogSlice.middleware),
+        devTools:true
+    
+   
 })
 

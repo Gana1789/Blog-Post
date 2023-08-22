@@ -1,10 +1,10 @@
 import React from 'react'
 import { UnorderedList, ListItem } from '@chakra-ui/react'
-import { useSelector } from 'react-redux'
-import { selectAllUsers } from '../features/usersSlice'
+import {  useGetUsersQuery } from '../features/usersSlice'
 import { Link } from 'react-router-dom';
 function AllUsers() {
-    const users=useSelector(selectAllUsers);
+    const {users, isLoading}=useGetUsersQuery("getUsers")
+   // const users=useSelector(selectAllUsers);
     const userList= users.map((user)=>{
         return <ListItem key={user.id}><Link to={`/user/${user.id}`}>{user.name}</Link></ListItem>
     })

@@ -1,9 +1,9 @@
-import React, { useState, useRef } from 'react'
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useState, useRef, useEffect } from 'react'
+
 import { useParams, useNavigate} from 'react-router-dom';
-import { userName } from '../features/usersSlice';
-import { deletePost, updatePost } from '../features/postsSlice';
-import { postDetails } from '../features/postsSlice';
+
+import {  useGetPostsQuery ,useUpdatePostMutation, useDeletePostMutation} from '../features/postsSlice';
+
 import UsersList from './UsersList';
 import {
     FormControl,
@@ -16,69 +16,80 @@ import {
   } from '@chakra-ui/react'
 function EditPost() {
     const {postId}=useParams()
-    
+    const [updatePost, {isLoading}]=useUpdatePostMutation()
+    const [deletePost]=useDeletePostMutation()
     const navigate=useNavigate();
-    const post=useSelector((state)=> postDetails(state,Number(postId)));
+    const {post, isLoading: isLoadingPosts, isSuccess} = useGetPostsQuery("getPosts",{
+      selectFromResult: ({data,isLoading,isSuccess})=>{
+        data.entities[postId],
+        isLoading,
+        isSuccess
+      }
+    }
+    )
+   // const post=useSelector((state)=> postDetails(state,Number(postId)));
    const userContact= useSelector((state)=> userName(state, Number(post.userId)))
-    const [title,setTitle]=useState(post.title)
-    const [content,setContent]=useState(post.body)
+    const [title,setTitle]=useState('')
+    const [content,setContent]=useState('')
    const authorSelection=useRef();
-    const [userId,setUserId]=useState(post.userId)
+    const [userId,setUserId]=useState('')
     const [isError,setIsError]=useState(false);
-    const [editStatus,setEditStatus]=useState("idle")
+    
     const onTitleChange= (e)=> setTitle(e.target.value)
     const onContentChange=(e)=> setContent(e.target.value)
     const onAuthorChange=(e)=> setUserId(e.target.value)
-    const dispatch =useDispatch()
+    
     const reactions={...post.reactions}
+    useEffect(()=>{
+      if(isSuccess){
+        setTitle(post.title);
+        setContent(post.body);
+        setUserId(post.userId);
+      }
+    },[isSuccess, post.title,post.body,post.userId])
     console.log(userContact)
-    const editPost=()=>{
+    const editPost=async ()=>{
         try{
-            if(title && content && userId && editStatus==="idle" ){
-                dispatch(updatePost({id:postId,title,body:content,userId,reactions})).unwrap();
+            if(title && content && userId && !isLoading ){
+                await updatePost({id:postId,title,body:content,userId,reactions}).unwrap();
+               // dispatch(updatePost({id:postId,title,body:content,userId,reactions})).unwrap();
                 setContent('')
                 setTitle('')
                 setUserId('')
                 authorSelection.current.selectedIndex=0
                 navigate('/')
-                setEditStatus("fulfilled")
+               
             }
         }
         catch(er){
             setIsError(true)
             console.error("failed to edit")
            }
-           finally{
-            setEditStatus("idle")
-           }
+           
         
     }
-    const deleteAction=()=>{
+    const deleteAction= async ()=>{
       try{
-        if(title && content && userId && editStatus==="idle" ){
-          dispatch(deletePost({id:postId})).unwrap()
+        if(title && content && userId  ){
+         await deletePost({id:post.id}).unwrap()
           
             setContent('')
             setTitle('')
             setUserId('')
             authorSelection.current.selectedIndex=0
             navigate('/')
-            setEditStatus("fulfilled")
+            
         }
     }
     catch(er){
         setIsError(true)
         console.error("failed to edit")
        }
-       finally{
-        setEditStatus("idle")
-       }
+       
      
     }
   return (
     <div>  <section className=''>
-       
-
     <h2 className='p-8'> Edit Post</h2>
    
     <FormControl className='flex flex-col gap-2'>
