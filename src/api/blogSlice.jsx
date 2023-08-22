@@ -1,8 +1,8 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query'
 
 export const blogSlice=createApi({
-    reducerPath:"blog",
+    reducerPath:"api",
+    baseQuery: fetchBaseQuery({baseUrl: 'http://localhost:3000'}),
     tagTypes: ["Post","User"],
-    baseQuery: fetchBaseQuery({baseUrl: 'http://localhost:3500'}),
     endpoints: builder=>({})
 })

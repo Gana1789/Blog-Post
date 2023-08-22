@@ -9,7 +9,6 @@ import EditPost from './components/EditPost'
 import AllUsers from './components/AllUsers'
 import UserPosts from './components/UserPosts'
 
-
 function App() {
  
 
