@@ -108,6 +108,8 @@ export const extendedBlogSlice= blogSlice.injectEndpoints({
         })
     })
     })
+    // console.log(extendedBlogSlice.endpoints.getPosts.initiate("getPosts"))
+    console.log(extendedBlogSlice.endpoints.getPosts.select().length)
     export const {
         useGetPostsQuery,
         useGetPostsByUserIdQuery,
@@ -116,8 +118,7 @@ export const extendedBlogSlice= blogSlice.injectEndpoints({
         useDeletePostMutation,
         useReactionAddedMutation
     } = extendedBlogSlice
-
-    console.log(useGetPostsQuery)
+    
     
    
 

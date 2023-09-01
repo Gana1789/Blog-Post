@@ -1,6 +1,6 @@
 import React from 'react'
 
-import {  useReactionAddedMutation } from '../features/postsSlice'
+// import {  useReactionAddedMutation } from '../features/postsSlice'
 import { Button } from '@chakra-ui/react'
 function Reactions({post}) {
     const reactionEmoji = {

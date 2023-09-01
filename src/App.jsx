@@ -1,6 +1,6 @@
 
 import './App.css'
-import PostsList from './components/PostsList'
+
 import AddPost from './components/AddPost'
 import {Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
@@ -9,9 +9,12 @@ import EditPost from './components/EditPost'
 import AllUsers from './components/AllUsers'
 import UserPosts from './components/UserPosts'
 
+import PostsList from './components/PostsList'
+import { store } from './app/store'
+
 function App() {
  
-
+console.log(store);
   return (
     <Routes>
       <Route path="/" element={<Layout/>}>

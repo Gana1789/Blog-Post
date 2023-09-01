@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 
 import { useParams, useNavigate} from 'react-router-dom';
-
-import {  useGetPostsQuery ,useUpdatePostMutation, useDeletePostMutation} from '../features/postsSlice';
+ import {  useGetPostsQuery ,useUpdatePostMutation, useDeletePostMutation} from '../features/postsSlice';
 
 import UsersList from './UsersList';
 import {
