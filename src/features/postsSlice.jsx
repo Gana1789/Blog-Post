@@ -7,7 +7,7 @@ const initialState = postsAdaptor.getInitialState()
 
 
 export const extendedBlogSlice= blogSlice.injectEndpoints({
-    endpoints: builder=>({
+    endpoints: (builder)=>({
         getPosts: builder.query({
             query: ()=> '/posts',
             transformResponse: responseData => {
@@ -110,16 +110,24 @@ export const extendedBlogSlice= blogSlice.injectEndpoints({
     })
     // console.log(extendedBlogSlice.endpoints.getPosts.initiate("getPosts"))
     console.log(extendedBlogSlice.endpoints.getPosts.select().length)
-    export const {
-        useGetPostsQuery,
-        useGetPostsByUserIdQuery,
-        useAddNewPostMutation,
-        useUpdatePostMutation,
-        useDeletePostMutation,
-        useReactionAddedMutation
-    } = extendedBlogSlice
+    // export const {
+    //     useGetPostsQuery,
+    //     useGetPostsByUserIdQuery,
+    //     useAddNewPostMutation,
+    //     useUpdatePostMutation,
+    //     useDeletePostMutation,
+    //     useReactionAddedMutation
+    // } = {...extendedBlogSlice.endpoints}
+    export const {useGetPostsQuery} =extendedBlogSlice.endpoints.getPosts
+    export const {useGetPostsByUserIdQuery} =extendedBlogSlice.endpoints.getPostsByUserId
+    export const {useAddNewPostMutation} =extendedBlogSlice.endpoints.addNewPost
+    export const {useUpdatePostMutation} =extendedBlogSlice.endpoints.updatePost
+    export const {useDeletePostMutation} =extendedBlogSlice.endpoints.deletePost
+    export const {useReactionAddedMutation} =extendedBlogSlice.endpoints.reactionAdded
     
     
    
 
+
+  
 
