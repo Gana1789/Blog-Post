@@ -12,6 +12,7 @@ const useSignUp =()=>{
             const response =await axios.post('http://localhost:8080/auth/signUp',data);
             return response.json;
         },
+        retry:false
        
     })
 }

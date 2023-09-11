@@ -78,18 +78,34 @@ const authSlice= createSlice({
             state.activeUserId=action.payload.username
         },
         logOut(state,action){
-            let userdetails=state.loggedInUsers.map(log=> log.username!=action.username)
-            state.loggedInUsers=userdetails
-            state.activeUserId=""
-        }
+            return {...initialState};
+            
+        },
+       
     }
 })
 
-export const getLoginDetails= useSelector((state)=> state.auth.loggedInUsers);
-export const getLoginDetailsByUsername= createSelector([getLoginDetails],(loggers,username)=>{
-   return loggers.find(l=> l.username==username)
-})
-export const getActiveUserName= useSelector((state)=> state.auth.activeUserId);
+export const getLoginDetails = (state) => {console.log(state.auth)
+    return state.auth.loggedInUsers};
+
+export const getLoginDetailsByUsername = createSelector(
+  [getLoginDetails, (state, username) => username],
+  (loggers, username) => {
+    console.log(loggers);
+    return loggers.find((l) => l.username === username);
+  }
+);
+
+export const getActiveUserName= ((state)=> state.auth.activeUserId);
 export const {login,logOut} =authSlice.actions;
 
 export default authSlice.reducer;
+
+
+
+
+
+
+// export const selectAuth =(state)=> state.auth;
+// export const getLoginDetails =createSelector([selectAuth],
+//     (auth)=> auth.loggedInUsers)

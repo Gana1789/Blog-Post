@@ -2,6 +2,7 @@ package com.blogpost.blog.controller;
 
 import com.blogpost.blog.dto.*;
 import com.blogpost.blog.exception.TokenRefreshException;
+import com.blogpost.blog.model.Author;
 import com.blogpost.blog.model.RefreshToken;
 import com.blogpost.blog.model.User;
 import com.blogpost.blog.repository.RefreshTokenRepository;
@@ -9,6 +10,7 @@ import com.blogpost.blog.repository.UserRepository;
 import com.blogpost.blog.security.jwt.JwtUtils;
 import com.blogpost.blog.security.service.RefreshTokenService;
 import com.blogpost.blog.security.service.UserDetailsImplementation;
+import com.blogpost.blog.service.AuthorService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @RestController
@@ -35,7 +39,8 @@ public class AuthenticationController {
 
     @Autowired
     PasswordEncoder passwordEncoder;
-
+    @Autowired
+    AuthorService authorService;
     @Autowired
     RefreshTokenRepository refreshTokenRepository;
     @Autowired
@@ -48,7 +53,7 @@ public class AuthenticationController {
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequestDTO loginRequestDTO){
         Authentication authentication=authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequestDTO.getUsername(),loginRequestDTO.getPassword()));
-        logger.info(loginRequestDTO.getUsername());
+        //logger.info(loginRequestDTO.getUsername());
         Optional<User> user=userRepository.findByUsername(loginRequestDTO.getUsername());
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -57,30 +62,33 @@ public class AuthenticationController {
         logger.info(String.valueOf("login-api"+String.valueOf(userDetailsImplementation.getUsername())));
 
         String jwt=jwtUtils.generateJwtToken(authentication);
-        if(user.isPresent()){
-           Optional<RefreshToken> rft= refreshTokenRepository.findByUser_Id(user.get().getId());
-           if(rft.isPresent()){
-               String existingRefresh=rft.get().getToken();
-               if(rft.get().getExpiryDate().compareTo(Instant.now())<0){
-                   refreshTokenService.deleteByUserId(user.get().getId());
+        int related_author= authorService.getAuthorByUser(user.get().getUsername());
+        logger.info(String.valueOf(related_author));
+        Optional<RefreshToken> rft = refreshTokenRepository.findByUser_Id(user.get().getId());
+        if(rft.isPresent()){
+            String existingRefresh=rft.get().getToken();
+            if(rft.get().getExpiryDate().compareTo(Instant.now())<0){
+                refreshTokenService.deleteByUserId(user.get().getId());
 
-                   return ResponseEntity.ok(new JwtResponse(jwt,"Bearer",refreshTokenService.generateRefreshToken(userDetailsImplementation.getId()).getToken(),userDetailsImplementation.getId(),
-                           userDetailsImplementation.getUsername(), userDetailsImplementation.getEmail()));
-               }
-               else {
-                   return ResponseEntity.ok(new JwtResponse(jwt,"Bearer",existingRefresh,userDetailsImplementation.getId(),
-                       userDetailsImplementation.getUsername(), userDetailsImplementation.getEmail()));
-               }
-           }
+                return ResponseEntity.ok(new JwtResponse(jwt,"Bearer",refreshTokenService.generateRefreshToken(userDetailsImplementation.getId()).getToken(),userDetailsImplementation.getId(),
+                        userDetailsImplementation.getUsername(), userDetailsImplementation.getEmail(), related_author));
+            }
+            else {
+                return ResponseEntity.ok(new JwtResponse(jwt,"Bearer",existingRefresh,userDetailsImplementation.getId(),
+                    userDetailsImplementation.getUsername(), userDetailsImplementation.getEmail(), related_author));
+            }
         }
 
-            return ResponseEntity.ok(new JwtResponse(jwt,"Bearer",refreshTokenService.generateRefreshToken(userDetailsImplementation.getId()).getToken(),userDetailsImplementation.getId(),
-                    userDetailsImplementation.getUsername(), userDetailsImplementation.getEmail()));
+        return ResponseEntity.ok(new JwtResponse(jwt,"Bearer",refreshTokenService.generateRefreshToken(userDetailsImplementation.getId()).getToken(),userDetailsImplementation.getId(),
+                    userDetailsImplementation.getUsername(), userDetailsImplementation.getEmail(), related_author));
 
     }
 
     @PostMapping("/signUp")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpDTO signUpDTO){
+        logger.info((signUpDTO.getUsername()));
+        logger.info((signUpDTO.getEmail()));
+        logger.info((signUpDTO.getPassword()));
         if(userRepository.existsByUsername(signUpDTO.getUsername())){
             return ResponseEntity.badRequest().body(new JwtMessageResponse("Error: Username is already taken"));
         }
@@ -89,6 +97,14 @@ public class AuthenticationController {
         }
         User user =new User(signUpDTO.getUsername(),  signUpDTO.getEmail(), passwordEncoder.encode(signUpDTO.getPassword()));
         userRepository.save(user);
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
+        String creation_Time = currentDateTime.format(formatter);
+        Author author=new Author();
+        author.setAuthor_name(signUpDTO.getUsername());
+        author.setEmail(signUpDTO.getEmail());
+        author.setAuthor_creation(creation_Time);
+        authorService.saveAuthor(author);
         return  ResponseEntity.ok(new JwtMessageResponse("User registered successfully"));
     }
 
@@ -107,15 +123,12 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signOut")
-    public ResponseEntity<?> logOut(@RequestHeader String accessToken){
-        logger.info(accessToken);
-        String userName=jwtUtils.getUserNameFromJwtToken(accessToken);
-        logger.info(userName);
+    public ResponseEntity<?> logOut(@RequestHeader String userName){
 
+        logger.info(userName);
        Optional<User> signOutUser= userRepository.findByUsername(userName);
        if(signOutUser.isPresent()){
-
-                   Long userId=signOutUser.get().getId();
+           Long userId=signOutUser.get().getId();
            int rowsEffected=refreshTokenService.deleteByUserId(userId);
            logger.info(String.valueOf(rowsEffected));
            return ResponseEntity.ok(new JwtMessageResponse("Logged out Successfully"));

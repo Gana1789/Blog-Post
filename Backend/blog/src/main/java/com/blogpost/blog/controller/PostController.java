@@ -3,6 +3,7 @@ package com.blogpost.blog.controller;
 import com.blogpost.blog.dto.PostDTO;
 import com.blogpost.blog.model.Author;
 import com.blogpost.blog.model.Post;
+import com.blogpost.blog.model.Reactions;
 import com.blogpost.blog.repository.AuthorRepository;
 import com.blogpost.blog.service.AuthorService;
 import com.blogpost.blog.service.PostService;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +34,7 @@ public class PostController {
     public AuthorService authorService;
 
     @GetMapping("/posts")
+
     public ResponseEntity<List<Post>> getPosts(){
 
         return ResponseEntity.ok(postService.getAllPosts());
@@ -55,19 +59,30 @@ public class PostController {
     @PostMapping(value = "/addPost")
     public ResponseEntity<Post> savePost(@RequestBody PostDTO postDTO){
         Post post=new Post();
-        Optional<Author> author=authorService.getAuthor(postDTO.getAuthor_Id());
+        Reactions reactions=new Reactions();
+        reactions.setLove(0);
+        reactions.setThumbsUp(0);
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
+        String creation_Time = currentDateTime.format(formatter);
+        //logger.info(creation_Time);
+        postDTO.setCreated_time(creation_Time);
+        logger.info(String.valueOf(postDTO.getDescription()));
+        logger.info(String.valueOf(postDTO.getCreated_time()));
+        logger.info(String.valueOf(postDTO.getTitle()));
+        logger.info(String.valueOf(postDTO.getAuthor_id()));
+        Optional<Author> author=authorService.getAuthor(postDTO.getAuthor_id());
         post.setTitle(postDTO.getTitle());
         post.setDescription(postDTO.getDescription());
         post.setCreated_time(postDTO.getCreated_time());
+        post.setReactions(reactions);
          author.ifPresent(post::setAuthor);
+        reactions.setPost(post);
 //        if(author.isPresent()){
 //            author.
 //        }
        // System.out.println(post.getAuthor().getAuthor_id());
-        logger.info(String.valueOf(postDTO.getDescription()));
-        logger.info(String.valueOf(postDTO.getCreated_time()));
-        logger.info(String.valueOf(postDTO.getTitle()));
-        logger.info(String.valueOf(postDTO.getAuthor_Id()));
+
         postService.savePost(post);
         return ResponseEntity.ok(post);
     }

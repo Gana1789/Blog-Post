@@ -30,16 +30,33 @@ public class Post {
   //@JsonIgnore
   private Author author;
 
+  @OneToOne(mappedBy = "post", cascade =CascadeType.ALL)
+  @JsonManagedReference
+  private Reactions reactions;
+
   public Post() {
 
   }
 
-  public Post(Long post_id, String title, String description, String created_time, Author author) {
+  public void setPost_id(Long post_id) {
+    this.post_id = post_id;
+  }
+
+  public Reactions getReactions() {
+    return reactions;
+  }
+
+  public void setReactions(Reactions reactions) {
+    this.reactions = reactions;
+  }
+
+  public Post(Long post_id, String title, String description, String created_time, Author author, Reactions reactions) {
     this.post_id = post_id;
     this.title = title;
     this.description = description;
     this.created_time = created_time;
     this.author = author;
+    this.reactions=reactions;
   }
 
   public Long getPost_id() {

@@ -1,5 +1,6 @@
 package com.blogpost.blog.security.jwt;
 
+import com.blogpost.blog.exception.JwtException;
 import com.blogpost.blog.security.service.UserDetailsServiceImplementation;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -28,7 +29,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     private static final Logger logger= LoggerFactory.getLogger(AuthTokenFilter.class);
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, JwtException{
         try {
             String jwt=parseJwt(request);
             logger.info(jwt);
@@ -49,11 +50,16 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         }
         catch (Exception e){
             logger.error("Cannot set user authentication: {}", e.getMessage());
+            throw new JwtException("Token expired");
+
         }
         filterChain.doFilter(request,response);
     }
     private String parseJwt(HttpServletRequest request){
         String header=request.getHeader("Authorization");
+        logger.info(String.valueOf(request.getRequestURI()));
+//        logger.info(String.valueOf(request.getHeader()));
+        logger.info(request.getHeader("Authorization"));
         if(StringUtils.hasText(header) && header.startsWith("Bearer ")){
             return header.substring(7);
         }

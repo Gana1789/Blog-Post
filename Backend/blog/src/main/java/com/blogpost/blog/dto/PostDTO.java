@@ -19,6 +19,14 @@ public class PostDTO {
 
     }
 
+    public Integer getAuthor_id() {
+        return author_id;
+    }
+
+    public void setAuthor_id(Integer author_id) {
+        this.author_id = author_id;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -43,11 +51,5 @@ public class PostDTO {
         this.created_time = created_time;
     }
 
-    public Integer getAuthor_Id() {
-        return author_id;
-    }
 
-    public void setAuthor_Id(Integer author_id) {
-        this.author_id = author_id;
-    }
 }

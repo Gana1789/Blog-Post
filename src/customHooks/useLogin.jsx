@@ -17,6 +17,7 @@ const useLogin = () => {
       onSuccess: (data) => {
         dispatch(login(data));
       },
+      retry:false
     });
   };
 export default useLogin;

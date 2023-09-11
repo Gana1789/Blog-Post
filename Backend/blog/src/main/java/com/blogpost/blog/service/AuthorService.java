@@ -20,6 +20,9 @@ public class AuthorService {
     public Optional<Author> getAuthor(int id){
         return  authorRepository.findById(id);
     }
+    public int getAuthorByUser(String user){
+        return  authorRepository.findByAuthorName(user);
+    }
 
     public List<Author> getAuthorList(){
         return authorRepository.findAll();

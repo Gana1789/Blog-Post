@@ -7,16 +7,28 @@ public class JwtResponse {
     private Long id;
     private String username;
     private String email;
+    private int author_id;
+
+
+
     public  JwtResponse(){
 
     }
-    public JwtResponse(String token, String type, String refreshToken,Long id, String username, String email) {
+    public JwtResponse(String token, String type, String refreshToken,Long id, String username, String email, int author_id) {
         this.token = token;
         this.type = type;
         this.refreshToken=refreshToken;
         this.id = id;
         this.username = username;
         this.email = email;
+        this.author_id=author_id;
+    }
+    public int getAuthor_id() {
+        return author_id;
+    }
+
+    public void setAuthor_id(int author_id) {
+        this.author_id = author_id;
     }
 
     public String getRefreshToken() {
