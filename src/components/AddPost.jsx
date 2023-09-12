@@ -9,43 +9,41 @@ import {
     Select
   } from '@chakra-ui/react'
 
-
-import UsersList from './UsersList'
-
-import {  useAddNewPostMutation } from '../features/postsSlice'
 import {useNavigate} from 'react-router-dom'
+import useAddPost from '../customHooks/useAddPost'
+import { useSelector } from 'react-redux'
+import { getActiveUserName, getLoginDetailsByUsername } from '../features/authSlice'
 function AddPost() {
-  const [addNewPost, {isLoading}]= useAddNewPostMutation()
-  const navigate=useNavigate();
+    const {mutateAsync: addNewPost,isSuccess, isLoading}= useAddPost()
+    const navigate=useNavigate();
     const [title,setTitle]=useState('')
     const [content,setContent]=useState('')
-   const authorSelection=useRef();
-    
-    const [userId,setUserId]=useState('')
+   
+    const  loginUserName=useSelector(getActiveUserName);
+    const  loginUserDetails=useSelector((state)=>getLoginDetailsByUsername(state,loginUserName));
+    const [userId,setUserId]=useState(loginUserDetails.author_id)
     const [isError,setIsError]=useState(false);
     const onTitleChange= (e)=> setTitle(e.target.value)
     const onContentChange=(e)=> setContent(e.target.value)
-    const onAuthorChange=(e)=> setUserId(e.target.value)
    
     const savePost= async()=>{
         if(title && content && !isLoading){
            try{
-            await addNewPost({title,body:content,userId}).unwrap();
-            // dispatch(addPost({title,body:content,userId})).unwrap()
-             setContent('')
-             setTitle('')
-             setUserId('')
-             authorSelection.current.selectedIndex=0
-             navigate('/')
-            
+             const response=await addNewPost({title,content,userId})
+             console.log(isSuccess)
+             if(response){
+                console.log("added successfully")
+                 setContent('')
+                 setTitle('')
+                 
+                 navigate('/post')
+             }
            }
            catch(er){
             setIsError(true)
             console.error("failed to save")
            }
-           
         }
-        
         else{
             setIsError(true)
         }
@@ -65,18 +63,11 @@ function AddPost() {
           
             <FormLabel>Post Content:</FormLabel>
             <Input type="text"  className="border-2 border-black" required onChange={onContentChange} value={content}></Input>
-          
-      <Select placeholder='Select Author' ref={authorSelection} onChange={onAuthorChange}>
-        {/* <option value="" disabled selected>Select Author </option> */}
-   <UsersList/>
-      </Select>
             <Button
             mt={4}
             className='bg-blue-100'
             colorScheme='teal'
-            onClick={savePost}
-            
-          >
+            onClick={savePost} >
             Submit
           </Button>
         </FormControl>
@@ -85,3 +76,11 @@ function AddPost() {
 }
 
 export default AddPost
+
+
+
+
+{/* <Select placeholder='Select Author' ref={authorSelection} onChange={onAuthorChange}>
+        {/* <option value="" disabled selected>Select Author </option> */}
+        // <UsersList/>
+    // </Select> */}

@@ -1,34 +1,39 @@
-import React, { useEffect } from 'react'
-
-import { useGetPostsQuery } from '../features/postsSlice';
+import React, { useEffect, useState } from 'react'
+import { logOut } from '../features/authSlice';
 import PostData from './PostData'
+import useGetPosts from '../customHooks/useGetPosts';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import useSignOut from '../customHooks/useSignOut';
+import { useQueryClient } from '@tanstack/react-query';
 function PostsList() {
-  console.log(useGetPostsQuery)
-  const {
-    data: posts,
-    isLoading,
-    isSuccess,
-    isError,
-    error
-  } = useGetPostsQuery();
   
+const dispatch=useDispatch()
+  const navigate=useNavigate()
+    const {data:posts, isLoading,isSuccess, isError, error}=useGetPosts("posts");
+    const queryClient = useQueryClient();
     let postDisplay;
+    useEffect(()=>{
+      
+      queryClient.invalidateQueries('posts');
+      if(isError){
+        navigate("/logout")
+      }
+    },[isError])
     
     if(isLoading){
       postDisplay=<p>Loading...</p>
     }
    else if(isSuccess){
       
-      const sortedPosts= posts.slice().sort((a,b)=> b.date.localeCompare(a.date))
+      const sortedPosts= posts.slice().sort((a,b)=> b.created_time> a.created_time)
   ;
-  console.log(sortedPosts)     
+
   postDisplay= sortedPosts.map(post=>{
-        return <PostData key={post.id} post={post}></PostData>
-      })
+    return <PostData key={post.post_id} post={post}></PostData>
+  })
     }
-    else if(isError){
-      postDisplay= <p>{error}</p>
-    }
+
   return (
     <section className='mt-1 justify-center items-center flex flex-col w-screen '>
        
