@@ -4,7 +4,7 @@ import PostData from './PostData'
 import useGetPosts from '../customHooks/useGetPosts';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import useSignOut from '../customHooks/useSignOut';
+// import { getActiveUserName } from '../features/authSlice';
 import { useQueryClient } from '@tanstack/react-query';
 function PostsList() {
   
@@ -12,11 +12,12 @@ const dispatch=useDispatch()
   const navigate=useNavigate()
     const {data:posts, isLoading,isSuccess, isError, error}=useGetPosts("posts");
     const queryClient = useQueryClient();
+   // const  loginUserName=useSelector(getActiveUserName);
     let postDisplay;
     useEffect(()=>{
-      
+      console.log(error)
       queryClient.invalidateQueries('posts');
-      if(isError){
+      if(isError && error.response.status!=200){
         navigate("/logout")
       }
     },[isError])

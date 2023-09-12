@@ -78,7 +78,8 @@ const authSlice= createSlice({
             state.activeUserId=action.payload.username
         },
         logOut(state,action){
-            return {...initialState};
+            state.loggedInUsers=[]
+            state.activeUserId=""
             
         },
        

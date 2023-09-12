@@ -32,7 +32,7 @@ function Login() {
               setPassword("")
              // setLoginState(true)
               setLoginStatus(true)
-            Navigate("/post")
+           
             }
             
            } catch (error) {

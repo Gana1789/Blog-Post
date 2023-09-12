@@ -54,7 +54,7 @@ function SignUp() {
         <Button onClick={handleSignUp}> SignUp</Button>
 
         <p>Already Existing User!</p>
-        <Link to="/login" from={useLocation} replace>Login</Link>
+        <Link to="/login" from={useLocation().pathname} replace>Login</Link>
     </FormControl>}
     {( registerStatus )&& <p>Registered Successfully</p>}
     {/* {!signUpBool &&  <Navigate to="/"  state={{ from: location }} replace/>} */}
