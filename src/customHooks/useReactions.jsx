@@ -6,7 +6,7 @@ const useReactions=(()=>{
 
     // Get QueryClient from the context
     const queryClient = useQueryClient()
-    const customAxios=useCustomAxios();
+    const {customAxios: customAxios, clearToken: clearToken}=useCustomAxios();
    
         return useMutation({
             mutationFn:async ({postId, reactionType, actionType})=>{

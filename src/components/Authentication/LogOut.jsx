@@ -5,8 +5,11 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import useSignOut from '../../customHooks/useSignOut';
 import { logOut } from '../../features/authSlice';
+import useCustomAxios from '../../customHooks/useCustomAxios';
+
 function LogOut() {
-  const dispatch = useDispatch();
+    const dispatch = useDispatch();
+  const {customAxios: customAxios, clearToken: clearToken}=useCustomAxios();
   const navigate = useNavigate();
   const {mutateAsync:signOut, isSuccess}=useSignOut()
   const loginUserName=useSelector(getActiveUserName)
@@ -18,6 +21,7 @@ function LogOut() {
           const response=await signOut()
                 if(isSuccess){
                     dispatch(logOut())
+                    clearToken();
                     navigate('/');
                 }
          

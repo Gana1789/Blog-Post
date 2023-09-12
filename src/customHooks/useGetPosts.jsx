@@ -2,7 +2,8 @@ import {  useQuery } from "@tanstack/react-query";
 import useCustomAxios from "./useCustomAxios";
 
 const useGetPosts= ()=>{
-    const customAxios=useCustomAxios();
+    const {customAxios: customAxios, clearToken: clearToken}=useCustomAxios();
+    
     return useQuery({
         queryKey: ['posts'], queryFn:async()=>{
             try{
